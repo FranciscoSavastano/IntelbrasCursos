@@ -52,10 +52,10 @@ for i in range(int(pages)):
     # renderiza conteudo da web
     page_content = client.general_request(url).content
 
+    print("Extraindo dados da pagina")
     # redige conteudo para texto com BeautifulSoup
     soup = BeautifulSoup(page_content, features= "html5lib")
     #encontre todos elementos da pagina com tag <a> e classe "link-produto", corresponde as grades dos cursos
-    print("Extraindo dados da pagina")
     textoHTML = soup.find_all("a" ,class_="link-produto")
     #itera entre elementos da pagina, cada elemento corresponde a um curso mostrado na pagina, cada um possui link e nome
     listaresultado = []
