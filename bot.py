@@ -12,8 +12,9 @@ page_content = client.general_request(url).content
 
 # redige conteudo para texto com BeautifulSoup
 soup = BeautifulSoup(page_content, features= "html5lib")
+#encontre todos elementos da pagina com tag <a> e classe "link-produto", corresponde as grades dos cursos
 textoHTML = soup.find_all("a" ,class_="link-produto")
-#adicionar loop for, para loopear entre cada instancia do catalogo de cursos, cada indice possui link do curso e nome
+#itera entre elementos da pagina, cada elemento corresponde a um curso mostrado na pagina, cada um possui link e nome
 for i in range(len(textoHTML)):
     print(textoHTML[i], i)
 
