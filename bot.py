@@ -119,4 +119,3 @@ for i in range(int(pages)):
 workbook.close()
 print("Arquivo salvo com sucesso!")
 
-
