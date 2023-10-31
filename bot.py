@@ -10,9 +10,9 @@ def criaplanilha(nomes, links, currrow, colrow, currpag, worksheet, workbook):
         worksheet = workbook.add_worksheet()
         column = 0
         tempstring = ""
-    else:
-        novoarq = False
-        num = 1
+    else:                       
+        novoarq = False                                                                             
+        num = 1 
         while novoarq == False:
             arquivo = os.path.exists(f"cursos{num}.xlsx")
             if arquivo == False:
@@ -22,6 +22,8 @@ def criaplanilha(nomes, links, currrow, colrow, currpag, worksheet, workbook):
                     worksheet = workbook.add_worksheet()
                     worksheet.write(0, 0, "Cursos")
                     worksheet.write(0, 1, "Links")
+                    currrow = 1
+                    colrow = 1
                 row = 1
                 column = 0
                 tempstring = ""
@@ -33,9 +35,9 @@ def criaplanilha(nomes, links, currrow, colrow, currpag, worksheet, workbook):
             tempstring += str(nomes[i][j])
             tempstring += " "
         tempstring = tempstring.split("=")
-        worksheet.write(currrow + 1, column, str(tempstring[1]))
-        if currrow <= i + 1:
-            currrow = i
+        
+        worksheet.write(currrow, column, str(tempstring[1]))
+        currrow += 1
 
     for i, l in enumerate(links):
         tempstring = ""
@@ -62,7 +64,8 @@ pages = int(input("Insira a quantidade de paginas da pesquisa de cursos: "))
 #url = "https://cursos.intelbras.com.br/portal/layout/927/intelbras/home.asp?V29ya3NwYWNlSUQ9MTI2NSZjRmlsdHJvPSRNb2RvPWdyaWQmRmlsdHJvcyRQYWdpbmE6MSZQb3JQYWdpbmE6MjAmQ2F0ZWdvcmlhc0ZpbHRyYWRhc0AkaWQ9MTImbm9tZT1Db211bmljYSVDMyVBNyVDMyVBM28mY2F0ZWdvcmlhX2lkPTcmY2F0ZWdvcmlhX25vbWU9VW5pZGFkZSZxdGQ9Nzc7JiRpZD05NyZub21lPUdyYXR1aXRvJmNhdGVnb3JpYV9pZD0xNCZjYXRlZ29yaWFfbm9tZT1Db25kaSVDMyVBNyVDMyVBM28mcXRkPTM0OzsmQnVzY2FUZXJtbzpudWxsJlRpcG9GaWx0cmFkbz1Ub2RvcyZXb3Jrc3BhY2VJRDoxMjY1Jmt0X2RpZGF4aXM9dG9w#"
 worksheet = ""
 workbook = ""
-currrow = colrow = 0
+currrow = 1
+colrow = 0
 for i in range(int(pages)):
     url = input(f"Insira a url da pagina {i + 1} de pesquisa de cursos: ")
     print("Inicializando API")
@@ -118,4 +121,5 @@ for i in range(int(pages)):
 
 workbook.close()
 print("Arquivo salvo com sucesso!")
+
 
