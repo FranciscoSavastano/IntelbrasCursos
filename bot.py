@@ -6,40 +6,57 @@ def criaplanilha(nomes, links):
     print("Escrevendo a planilha")
     arquivo = os.path.exists("cursos.xlsx")
     if arquivo == False:
-        workbook = xlsxwriter.Workbook("teste.xlsx")
+        workbook = xlsxwriter.Workbook("cursos.xlsx")
         worksheet = workbook.add_worksheet()
-        row = 0
+        prevrow = 1
+        currrow = 0
         column = 0
         tempstring = ""
-        templist = []
-        listalinksfim = [] 
+    else:
+        novoarq = False
+        num = 1
+        currrow = 0
+        while novoarq == False:
+            arquivo = os.path.exists(f"cursos{num}.xlsx")
+            if arquivo == False:
+                novoarq = True
+                workbook = xlsxwriter.Workbook(f"cursos{num}.xlsx")
+                worksheet = workbook.add_worksheet()
+                row = 1
+                column = 0
+                tempstring = ""
+            else:
+                num += 1
+    worksheet.write(0, 0, "Cursos")
+    worksheet.write(0, 1, "Links")
+    for i, l in enumerate(nomes):
+        tempstring = ""
+        for j, col in enumerate(l):
+            tempstring += str(nomes[i][j])
+            tempstring += " "
+        tempstring = tempstring.split("=")
+        worksheet.write(i + 1, column, str(tempstring[1]))
+        if currrow <= i + 1:
+            currrow = i
+
+    for i, l in enumerate(links):
+        tempstring = ""
+        for j, col in enumerate(l):
+            tempstring += str(links[i][j])
+            tempstring += " "
+        tempstring = tempstring.split("=")
+        tempstring = str(tempstring[1])
+        tempstring = tempstring.split('"')
+        if i % 2 != 0:
+            linkstr = "https://cursos.intelbras.com.br/portal/layout/927/intelbras/"
+            linkstr += tempstring[1]
+            worksheet.write(row, column + 1, str(linkstr))
+            row += 1
         
-        for i, l in enumerate(nomes):
-            tempstring = ""
-            for j, col in enumerate(l):
-                tempstring += str(nomes[i][j])
-                tempstring += " "
-            tempstring = tempstring.split("=")
-            worksheet.write(i, column, str(tempstring[1]))
-
-        for i, l in enumerate(links):
-            tempstring = ""
-            for j, col in enumerate(l):
-                tempstring += str(links[i][j])
-                tempstring += " "
-            tempstring = tempstring.split("=")
-            tempstring = str(tempstring[1])
-            tempstring = tempstring.split('"')
-            if i % 2 != 0:
-                linkstr = "https://cursos.intelbras.com.br/portal/layout/927/intelbras/"
-                linkstr += tempstring[1]
-                worksheet.write(row, column + 1, str(linkstr))
-                row += 1
-            
-            
-
-        print("Concluido com sucesso!")
-        workbook.close()
+        
+    print(currrow)
+    print("Concluido com sucesso!")
+    return worksheet, workbook
 
 # cria uma instacia de scraping com api      
 client = ScrapingAntClient(token='1d88dcb8f53f4f47954683c1a583177f')
@@ -63,6 +80,11 @@ for i in range(int(pages)):
     j = 0
     listanomes = []
     listalinks = []
+    if i > 0:
+        empty = False
+        r = c = 0
+        while empty == False:
+            print(worksheet.table.get(r, c))
     for i in range(len(textoHTML)):
         
         fixedstring = str(textoHTML[i])
@@ -85,9 +107,6 @@ for i in range(int(pages)):
         listanomes.append(tempnomelist)
         listalinks.append(templinklist)
         
-        #listaresultado.append(fixedstring[])
-        #listaresultado.append(fixedstring[3])
-
     listanomesfix = [] 
     for i in listanomes: 
         if i not in listanomesfix: 
@@ -99,7 +118,9 @@ for i in range(int(pages)):
             listalinksfix.append(i) 
             
 
-    criaplanilha(listanomesfix, listalinksfix)
+    worksheet, workbook = criaplanilha(listanomesfix, listalinksfix)
+
+workbook.close()
 
 
 
