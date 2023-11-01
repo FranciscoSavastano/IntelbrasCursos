@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from scrapingant_client import ScrapingAntClient
 import os, pandas as pd, jinja2, logging
 
-def scraping():
+def scraping(pages=1, url=""):
     def criaplanilha(nomes, links, currrow, colrow, currpag, worksheet, workbook, cursoslist, linkslist):
         logging.basicConfig(filename="logfilename.log", level=logging.INFO)
         print("Escrevendo a planilha")
@@ -35,7 +35,7 @@ def scraping():
 
     # cria uma instacia de scraping com api      
     client = ScrapingAntClient(token='1d88dcb8f53f4f47954683c1a583177f')
-    pages = int(input("Insira a quantidade de paginas da pesquisa de cursos: "))
+    #pages = int(input("Insira a quantidade de paginas da pesquisa de cursos: "))
     # Define a url para buscar o conteudo do site
     #url = "https://cursos.intelbras.com.br/portal/layout/927/intelbras/home.asp?V29ya3NwYWNlSUQ9MTI2NSZjRmlsdHJvPSRNb2RvPWdyaWQmRmlsdHJvcyRQYWdpbmE6MSZQb3JQYWdpbmE6MjAmQ2F0ZWdvcmlhc0ZpbHRyYWRhc0AkaWQ9MTImbm9tZT1Db211bmljYSVDMyVBNyVDMyVBM28mY2F0ZWdvcmlhX2lkPTcmY2F0ZWdvcmlhX25vbWU9VW5pZGFkZSZxdGQ9Nzc7JiRpZD05NyZub21lPUdyYXR1aXRvJmNhdGVnb3JpYV9pZD0xNCZjYXRlZ29yaWFfbm9tZT1Db25kaSVDMyVBNyVDMyVBM28mcXRkPTM0OzsmQnVzY2FUZXJtbzpudWxsJlRpcG9GaWx0cmFkbz1Ub2RvcyZXb3Jrc3BhY2VJRDoxMjY1Jmt0X2RpZGF4aXM9dG9w#"
     worksheet = ""
@@ -45,7 +45,7 @@ def scraping():
     cursoslist = []
     linkslist = []
     for i in range(int(pages)):
-        url = input(f"Insira a url da pagina {i + 1} de pesquisa de cursos: ")
+        #url = input(f"Insira a url da pagina {i + 1} de pesquisa de cursos: ")
         print("Inicializando API")
         # renderiza conteudo da web
         print("Extraindo dados da pagina")
