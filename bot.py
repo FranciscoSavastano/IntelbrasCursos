@@ -1,35 +1,11 @@
 from bs4 import BeautifulSoup
 from scrapingant_client import ScrapingAntClient
-import os, xlsxwriter, pandas as pd, jinja2
+import os, pandas as pd, jinja2, logging
 
 def scraping():
     def criaplanilha(nomes, links, currrow, colrow, currpag, worksheet, workbook, cursoslist, linkslist):
+        logging.basicConfig(filename="logfilename.log", level=logging.INFO)
         print("Escrevendo a planilha")
-        arquivo = os.path.exists("cursos.xlsx")
-        if arquivo == False:
-            workbook = xlsxwriter.Workbook("cursos.xlsx")
-            worksheet = workbook.add_worksheet()
-            column = 0
-            tempstring = ""
-        else:                       
-            novoarq = False                                                                             
-            num = 1 
-            while novoarq == False:
-                arquivo = os.path.exists(f"cursos{num}.xlsx")
-                if arquivo == False:
-                    novoarq = True
-                    if currpag == 0:
-                        workbook = xlsxwriter.Workbook(f"cursos{num}.xlsx")
-                        worksheet = workbook.add_worksheet()
-                        worksheet.write(0, 0, "Cursos")
-                        worksheet.write(0, 1, "Links")
-                        currrow = 1
-                        colrow = 1
-                    row = 1
-                    column = 0
-                    tempstring = ""
-                else:
-                    num += 1
         for i, l in enumerate(nomes):
             tempstring = ""
             for j, col in enumerate(l):
@@ -37,8 +13,7 @@ def scraping():
                 tempstring += " "
             tempstring = tempstring.split("=")
             cursoslist.append(tempstring[1])
-            worksheet.write(currrow, column, str(tempstring[1]))
-            print(f"escrita linha {tempstring[1]} na linha {currrow}")
+            logging.info(f"escrita linha {tempstring[1]} na linha {currrow}")
             currrow += 1
         for i, l in enumerate(links):
             tempstring = ""
@@ -52,7 +27,6 @@ def scraping():
                 linkstr = "https://cursos.intelbras.com.br/portal/layout/927/intelbras/"
                 linkstr += tempstring[1]
                 linkslist.append(linkstr)
-                worksheet.write(colrow, column + 1, str(linkstr))
                 colrow += 1
             
 
@@ -72,8 +46,6 @@ def scraping():
     linkslist = []
     for i in range(int(pages)):
         url = input(f"Insira a url da pagina {i + 1} de pesquisa de cursos: ")
-        if i == 0:
-            seg = input("Digite o nome do segmento: ")
         print("Inicializando API")
         # renderiza conteudo da web
         print("Extraindo dados da pagina")
@@ -83,6 +55,26 @@ def scraping():
         soup = BeautifulSoup(page_content, features= "html5lib")
         #encontre todos elementos da pagina com tag <a> e classe "link-produto", corresponde as grades dos cursos
         textoHTML = soup.find_all("a" ,class_="link-produto")
+        segHTML = soup.find_all("h4", class_= "pull-left filtros-aplicados margin-right-10")
+        pags = soup.find_all("ul", class_="pagination")
+        print(pags)
+        for i in range(len(segHTML)):
+            segHTMLstr = str(segHTML[i])
+            segHTMLstr = segHTMLstr.replace("<", "").replace(">", "").replace("*", "")
+            segHTMLstr = segHTMLstr.split()
+            print(segHTMLstr[5], segHTMLstr[6])
+            if "Gratuito" in segHTMLstr[5]:
+                if '"' in segHTMLstr[6]:
+                    segstr = str(segHTMLstr[6])
+                    segstr = segstr.split('"')
+                    segstr = str(segstr[0])
+                    print(segstr)
+                else:
+                    
+                    segstr = str(segHTMLstr[6])
+            else:
+                
+                segstr = str(segHTMLstr[5])
         #itera entre elementos da pagina, cada elemento corresponde a um curso mostrado na pagina, cada um possui link e nome
         listaresultado = []
         fim = False
@@ -125,16 +117,24 @@ def scraping():
 
         worksheet, workbook, currrow, colrow, cursoslist, linkslist = criaplanilha(listanomesfix, listalinksfix, currrow, colrow, currpag, worksheet, workbook, cursoslist, linkslist)
 
-    workbook.close()
     seglist = []
     for i in range(currrow):
-        seglist.append(seg)
+        seglist.append(segstr)
     columns=['Segmento','Cursos', 'Links']
     df = pd.DataFrame(list(zip(seglist, cursoslist,linkslist)), columns=columns)
     df.style.hide(axis="index")
-    print(df)
-    df.to_excel('Courses.xlsx')
+    logging.info(df)
+    num = 1
+    novoarq = False
+    while novoarq == False:
+        arquivo = os.path.exists(f"{segstr}{num}.xlsx")
+        if arquivo == False:
+            novoarq = True
+            df.to_excel(f'{segstr}{num}.xlsx')
+        else:
+            num += 1
     print("Arquivo salvo com sucesso!")
+    print(f"salvo em {os.getcwd()} nome: {segstr}{num}.xlsx")
 
 
 if __name__ == "__main__":
