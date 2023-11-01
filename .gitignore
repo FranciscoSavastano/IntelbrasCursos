@@ -9,3 +9,7 @@ teste.xlsx
 bot backup.py
 pandastest.py
 dist/Courses.xlsx
+Comunicação,1.xlsx
+.gitignore
+.gitignore
+__pycache__/bot.cpython-310.pyc
