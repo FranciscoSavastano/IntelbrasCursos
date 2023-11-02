@@ -1,0 +1,1 @@
+globals()[prefix + str(i) + suffix] = ttk.Entry(newWindow, width= 100)

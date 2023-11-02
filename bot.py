@@ -1,8 +1,9 @@
 from bs4 import BeautifulSoup
 from scrapingant_client import ScrapingAntClient
 import os, pandas as pd, jinja2, logging
-
-def scraping(pages=1, url=""):
+from tkinter import ttk
+import botgui
+def scraping(pages=1, url1 = "", url2= "", url3= "", url4 = ""):
     def criaplanilha(nomes, links, currrow, colrow, currpag, worksheet, workbook, cursoslist, linkslist):
         logging.basicConfig(filename="logfilename.log", level=logging.INFO)
         print("Escrevendo a planilha")
@@ -44,25 +45,36 @@ def scraping(pages=1, url=""):
     colrow = 0
     cursoslist = []
     linkslist = []
+    urllist = []
+    if url1 != "":
+        urllist.append(url1)
+    if url2 != "":
+        urllist.append(url2)
+    if url3 != "":
+        urllist.append(url3)
+    if url4 != "":
+        urllist.append(url4)
     for i in range(int(pages)):
         #url = input(f"Insira a url da pagina {i + 1} de pesquisa de cursos: ")
         print("Inicializando API")
         # renderiza conteudo da web
         print("Extraindo dados da pagina")
-        page_content = client.general_request(url).content
+        page_content = client.general_request(urllist[i]).content
 
         # redige conteudo para texto com BeautifulSoup
         soup = BeautifulSoup(page_content, features= "html5lib")
         #encontre todos elementos da pagina com tag <a> e classe "link-produto", corresponde as grades dos cursos
         textoHTML = soup.find_all("a" ,class_="link-produto")
         segHTML = soup.find_all("h4", class_= "pull-left filtros-aplicados margin-right-10")
-        pags = soup.find_all("ul", class_="pagination")
-        print(pags)
         for i in range(len(segHTML)):
             segHTMLstr = str(segHTML[i])
-            segHTMLstr = segHTMLstr.replace("<", "").replace(">", "").replace("*", "")
+            segHTMLstr = segHTMLstr.replace("<", "").replace(">", "").replace("*", "").replace("/h4", "").replace("h4", "")
             segHTMLstr = segHTMLstr.split()
-            print(segHTMLstr[5], segHTMLstr[6])
+            for i in range(len(segHTMLstr)):
+                if "Gratuito" not in segHTMLstr[i]:
+                    if "Online" not in segHTMLstr[i]:
+
+                        print(segHTMLstr[i])
             if "Gratuito" in segHTMLstr[5]:
                 if '"' in segHTMLstr[6]:
                     segstr = str(segHTMLstr[6])
@@ -135,6 +147,7 @@ def scraping(pages=1, url=""):
             num += 1
     print("Arquivo salvo com sucesso!")
     print(f"salvo em {os.getcwd()} nome: {segstr}{num}.xlsx")
+    botgui.fim(segstr, num)
 
 
 if __name__ == "__main__":
