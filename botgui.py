@@ -1,33 +1,37 @@
 from tkinter import * 
 import tkinter
+import customtkinter
 from tkinter import ttk
-from tkinter.messagebox import showinfo
+import tkinter.messagebox
 import bot
 import os
+
 def fim(nome, num):
-    showinfo(message=f'Arquivo salvo com sucesso\nem {os.getcwd()} nome: {nome}{num}.xlsx"')
+    tkinter.messagebox.showinfo(message=f'Arquivo salvo com sucesso\nem {os.getcwd()} nome: {nome}{num}.xlsx"')
 def crianewwindow(root, pags: int):
-        def verdinamic(prefix, suffix, pags):
+        def verdinamic(prefix, suffix, pags, progtext):
+            progtext.set("Extraindo pag(s), por favor aguarde")
             for i in range(pags):
                 globals()[prefix + str(i) + suffix]
             bot.scraping(pags, dinamico0entry.get(), dinamico1entry.get(), dinamico2entry.get(), dinamico3entry.get())
-        
         global btcount
         pags = int(pags)
         if pags != 0:
             if btcount == 0:
                 prevrow = 0
+                progtext = StringVar()
                 prefix = "dinamico"
                 suffix = "entry"
                 btcount += 1
-                newWindow = Toplevel(root)
+                global newWindow
+                newWindow = customtkinter.CTkToplevel(root)
                 newWindow.title("Exporta Planilha")
                 newWindow.geometry("700x200")
                 newWindow.resizable(False,False)
                 for i in range(4):
-                    globals()[prefix + str(i) + suffix] = ttk.Entry(newWindow, width= 75)
+                    globals()[prefix + str(i) + suffix] = customtkinter.CTkEntry(newWindow, width= 450)
                 for i in range(pags):
-                    ttk.Label(newWindow, text=f"Insira a URL da pagina {i + 1} do site da intelbras").grid(column=0, row=prevrow + i)
+                    customtkinter.CTkLabel(newWindow, text=f"Insira a URL da pagina {i + 1} do site da intelbras").grid(column=0, row=prevrow + i)
                     #magia negra para criar variaveis dinamicas com base no numero de paginas
                     
                     match i:
@@ -43,21 +47,19 @@ def crianewwindow(root, pags: int):
                 void.place(relx = 1, rely = 1)
                 pages = urlentry = ""
                 global pb
-                pb = ttk.Progressbar(newWindow, length = 200, mode= 'determinate')
-                send = ttk.Button(newWindow, text = "Enviar", command=lambda: [pb.start(7), verdinamic(prefix, suffix, pags)]).place(relx = 0.45, rely = 0.5)
-
-                fakepb = ttk.Progressbar(newWindow, length = 200, mode= 'determinate')
+                progtext.set("aguardando entrada")         
+                send = customtkinter.CTkButton(newWindow, text = "Enviar", command=lambda: [verdinamic(prefix, suffix, pags, progtext)]).place(relx = 0.45, rely = 0.6)
                 
-                fakepb.place(relx=0.355, rely = 0.7)
             else:
                 if 'normal' == root.state():
                         btcount = 0
 def gui():
-    root = Tk()
+    customtkinter.set_appearance_mode("dark")
+    root = customtkinter.CTk()
     root.geometry('200x200')
     root.title("Exporta Planilha")
     root.resizable(False,False)
-    frm = tkinter.Frame(root, height= 300)
+    frm = customtkinter.CTkFrame(root, height= 300)
     frm.grid(column=0, sticky=tkinter.E + tkinter.W)
     root.grid_columnconfigure(0,weight=1)
     v = DoubleVar()
@@ -68,13 +70,14 @@ def gui():
     Ir = [('1 Pagina', int(1)), ('2 Paginas', int(2)), ('3 Paginas',int(3)), ('4 Paginas', int(4))]
     relytemp = 0.05
     for Irv, val in Ir:
-        Irrad = Radiobutton(frm,text=Irv, variable=v, value=val, font=('verdana', 10))
+        Irrad = customtkinter.CTkRadioButton(frm,text=Irv, variable=v, value=val, font=('verdana', 10))
         Irrad.place(relx=0.01, rely=relytemp)
         relytemp += 0.08
-    pagssend = ttk.Button(frm, text = "Proximo" ,command=lambda:  [crianewwindow(root, v.get() )])
-    pagssend.place(relx=0.3, rely=0.5)
+    pagssend = customtkinter.CTkButton(frm, text = "Proximo" ,command=lambda:  [crianewwindow(root, v.get() )])
+    pagssend.place(relx=0.15, rely=0.5)
 
     root.mainloop()
 if __name__ == "__main__":
    # stuff only to run when not called via 'import' here
+   
    gui()
